@@ -1,52 +1,58 @@
-pipeline{
+pipeline {
     agent any
-    environment{
-    DOCKERHUB_CREDENTIALS = 'dockerhub-cred-id'
+
+    environment {
+        DOCKERHUB_CREDENTIALS = 'dockerhub-cred-id'
         DOCKERHUB_REPO = 'santhosh0476'
     }
-    stages{
-        stage('clone repo'){
-            steps{
-               git branch: 'main', url: 'https://github.com/santhoshmanoharan04/voting-app.git'
+
+    stages {
+
+        stage('Clone Repo') {
+            steps {
+                git branch: 'main', url: 'https://github.com/santhoshmanoharan04/voting-app.git'
             }
         }
-        stage('build image'){
-            steps{
+
+        stage('Build Images') {
+            steps {
                 sh '''
-                docker build -t santhosh0476/vote-app ./vote
-                docker build -t santhosh0476/worker ./worker
-                docker build -t santhosh0476/result-app ./result
+                docker build -t $DOCKERHUB_REPO/vote-app ./vote
+                docker build -t $DOCKERHUB_REPO/worker ./worker
+                docker build -t $DOCKERHUB_REPO/result-app ./result
                 '''
             }
         }
-        stage('login to docker'){
-            steps{
+
+        stage('Login to DockerHub') {
+            steps {
                 withCredentials([usernamePassword(
                     credentialsId: "$DOCKERHUB_CREDENTIALS",
-                    usernameVariable: 'santhosh0476',
-                    passwordVariable: 'praba200404'
-
-                )]){
-                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+                    usernameVariable: 'USERNAME',
+                    passwordVariable: 'PASSWORD'
+                )]) {
+                    sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
                 }
-
             }
         }
-        stage('push image'){
-            steps{
+
+        stage('Push Images') {
+            steps {
                 sh '''
-                docker push santhosh0476/vote-app
-                docker push santhosh0476/worker
-                docker push santhosh0476/result-app
+                docker push $DOCKERHUB_REPO/vote-app
+                docker push $DOCKERHUB_REPO/worker
+                docker push $DOCKERHUB_REPO/result-app
                 '''
             }
         }
-        stage('Deploy to Kubernetes'){
-           steps{
-            sh 'kubectl apply -f k8s/'
-           }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f k8s/'
+            }
         }
     }
+
     post {
         success {
             echo '✅ Deployment Successful 🚀'
@@ -55,5 +61,4 @@ pipeline{
             echo '❌ Deployment Failed'
         }
     }
-
 }
