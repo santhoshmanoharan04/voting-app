@@ -7,7 +7,7 @@ pipeline{
     stages{
         stage('clone repo'){
             steps{
-                git 'https://github.com/santhoshmanoharan04/voting-app.git'
+               git branch: 'main', url: 'https://github.com/santhoshmanoharan04/voting-app.git'
             }
         }
         stage('build image'){
