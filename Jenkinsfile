@@ -16,11 +16,11 @@ pipeline {
 
         stage('Build Images') {
             steps {
-                sh '''
+                sh """
                 docker build -t $DOCKERHUB_REPO/vote-app ./vote
                 docker build -t $DOCKERHUB_REPO/worker ./worker
                 docker build -t $DOCKERHUB_REPO/result-app ./result
-                '''
+                """
             }
         }
 
@@ -38,11 +38,11 @@ pipeline {
 
         stage('Push Images') {
             steps {
-                sh '''
+                sh """
                 docker push $DOCKERHUB_REPO/vote-app
                 docker push $DOCKERHUB_REPO/worker
                 docker push $DOCKERHUB_REPO/result-app
-                '''
+                """
             }
         }
 
@@ -55,10 +55,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment Successful 🚀'
+            echo 'Deployment Successful 🚀'
         }
         failure {
-            echo '❌ Deployment Failed'
+            echo 'Deployment Failed'
         }
     }
 }
