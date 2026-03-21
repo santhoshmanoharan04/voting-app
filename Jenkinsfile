@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS = 'dockerhub-cred-id'
         DOCKERHUB_REPO = 'santhosh0476'
+         KUBECONFIG = '/var/lib/jenkins/.kube/config'
     }
 
     stages {
